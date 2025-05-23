@@ -12,6 +12,7 @@ int test1() {
 
     cudaMalloc(&d_result, sizeof(int));
     test1_kernel<<<1, 1>>>(d_result);
+    cudaDeviceSynchronize();  // Wait for the kernel to finish
     cudaMemcpy(&h_result, d_result, sizeof(int), cudaMemcpyDeviceToHost);
     cudaFree(d_result);
 
