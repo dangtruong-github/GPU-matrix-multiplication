@@ -18,7 +18,7 @@ int test1() {
 
     std::cout << "h_result: " << h_result << "\n";
 
-    return h_result;
+    return 1;
 }
 
 PYBIND11_MODULE(naive, m) {
