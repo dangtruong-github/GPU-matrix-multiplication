@@ -1,7 +1,6 @@
 #include <torch/extension.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <pybind11/torch.h>
 
 torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2);
 
