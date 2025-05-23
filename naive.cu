@@ -17,6 +17,6 @@ int test1() {
     return h_result;
 }
 
-PYBIND11_MODULE(test_module, m) {
+PYBIND11_MODULE(naive, m) {
     m.def("test1", &test1, "A CUDA function that returns 0");
 }
