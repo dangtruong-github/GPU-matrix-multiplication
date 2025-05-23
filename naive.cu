@@ -2,7 +2,7 @@
 #include <cuda_runtime.h>
 
 __global__ void test1_kernel(int* result) {
-    *result = 0;  // CUDA kernel sets value to 0
+    *result = 1000;  // CUDA kernel sets value to 0
 }
 
 int test1() {
