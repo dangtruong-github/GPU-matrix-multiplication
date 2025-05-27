@@ -42,7 +42,7 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
     dim3 blockSize(MAX_BLOCK_SIZE);
     dim3 gridSize(max_grid_needed)
 
-    matmul_kernel<<<1, 1>>>(result.data_ptr<int>());
+    matmul_kernel<<<gridSize, blockSize>>>(result.data_ptr<int>());
     cudaDeviceSynchronize();  // ensure completion
     
     return result;
