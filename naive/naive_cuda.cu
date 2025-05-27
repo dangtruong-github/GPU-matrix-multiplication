@@ -9,8 +9,8 @@ __global__ void matmul_kernel(
     const int M, const int N, const int K
 ) {
     const int pos = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idxA = pos / M;
-    const int idxB = pos % M;
+    const int idxA = pos / N;
+    const int idxB = pos % N;
 
     if (pos >= M * N) return;
 
