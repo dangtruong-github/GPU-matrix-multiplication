@@ -27,8 +27,8 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
     in2 = in2.contiguous();
 
     const int M = in1.size(0);
-    const int N = in1.size(1);
-    const int K = in2.size(1);
+    const int K = in1.size(1);
+    const int N = in2.size(1);
 
     auto result = torch::zeros({M, N}, torch::device(torch::kCUDA).dtype(torch::kFloat32));
     
