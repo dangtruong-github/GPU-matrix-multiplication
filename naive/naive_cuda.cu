@@ -30,7 +30,7 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
     const int N = in1.size(1);
     const int K = in2.size(1);
 
-    auto result = torch::zeros({3}, torch::device(torch::kCUDA).dtype(torch::kInt32));
+    auto result = torch::zeros({M, N}, torch::device(torch::kCUDA).dtype(torch::kFloat32));
     
     // Create a CPU tensor with M, N, K for debugging
     // auto debug_tensor = torch::tensor({M, N, K}, torch::dtype(torch::kInt32));
@@ -42,7 +42,12 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
     dim3 blockSize(MAX_BLOCK_SIZE);
     dim3 gridSize(max_grid_needed);
 
-    matmul_kernel<<<gridSize, blockSize>>>(result.data_ptr<int>());
+    matmul_kernel<<<gridSize, blockSize>>>(
+        in1.data_ptr<float>(),
+        in2.data_ptr<float>(),
+        result.data_ptr<float>(),
+        M, N, K
+    );
     cudaDeviceSynchronize();  // ensure completion
     
     return result;
