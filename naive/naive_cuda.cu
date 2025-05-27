@@ -7,8 +7,8 @@ __global__ void test1_kernel(int* result) {
 }
 
 torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
-    torch::Tensor in1 = in1.contiguous();
-    torch::Tensor in2 = in2.contiguous();
+    in1 = in1.contiguous();
+    in2 = in2.contiguous();
 
     const int M = in1.size(0);
     const int N = in1.size(1);
