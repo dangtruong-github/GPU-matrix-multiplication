@@ -16,7 +16,7 @@ __global__ void matmul_kernel(
 
     float result = 0.0f;
     for (int i=0; i<K; i++) {
-        result += in1[idxA * M + i] * in2[i * K + idxB];
+        result += in1[idxA * K + i] * in2[i * N + idxB];
     }
 
     out[pos] = result;
