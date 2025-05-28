@@ -45,7 +45,7 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
     matmul_kernel<<<gridSize, blockSize>>>(
         in1.data_ptr<float>(),
         in2.data_ptr<float>(),
-        result.data_ptr<float>(),
+        result.contiguous().data_ptr<float>(),
         M, N, K
     );
     cudaDeviceSynchronize();  // ensure completion
