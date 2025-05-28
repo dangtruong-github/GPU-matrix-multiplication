@@ -18,7 +18,8 @@ __global__ void matmul_kernel(
     for (int i = 0; i < K; i++) {
         // Correct indices: in1 is MxK (row idxA, column i) => idxA*K + i
         //                  in2 is KxN (row i, column idxB) => i*N + idxB
-        float y = in1[row * K + i] * in2[i * N + col] - c;
+        float init_res = in1[row * K + i] * in2[i * N + col];
+        float y = init_res - c;
         float t = result + y;
         c = (t-result) - y;
 
