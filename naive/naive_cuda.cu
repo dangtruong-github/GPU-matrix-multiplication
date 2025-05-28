@@ -14,10 +14,15 @@ __global__ void matmul_kernel(
     if (row >= M || col >= N) return;
 
     float result = 0.0f;
+    float c = 0.0f;
     for (int i = 0; i < K; i++) {
         // Correct indices: in1 is MxK (row idxA, column i) => idxA*K + i
         //                  in2 is KxN (row i, column idxB) => i*N + idxB
-        result += in1[row * K + i] * in2[i * N + col];
+        float y = in1[row * K + i] * in2[i * N + col];
+        float t = result + y;
+        c = (t-result) - y;
+
+        result = t;
     }
 
     out[row * N + col] = result;
