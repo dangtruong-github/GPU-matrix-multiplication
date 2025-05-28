@@ -9,13 +9,15 @@ __global__ void matmul_kernel(
     const int M, const int N, const int K
 ) {
     const int pos = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idxA = pos / N;
-    const int idxB = pos % N;
+    const int idxA = pos / N;  // Row index in output (0..M-1)
+    const int idxB = pos % N;  // Column index in output (0..N-1)
 
     if (pos >= M * N) return;
 
     float result = 0.0f;
-    for (int i=0; i<K; i++) {
+    for (int i = 0; i < K; i++) {
+        // Correct indices: in1 is MxK (row idxA, column i) => idxA*K + i
+        //                  in2 is KxN (row i, column idxB) => i*N + idxB
         result += in1[idxA * K + i] * in2[i * N + idxB];
     }
 
@@ -32,12 +34,7 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
 
     auto result = torch::zeros({M, N}, torch::device(torch::kCUDA).dtype(torch::kFloat32));
     
-    // Create a CPU tensor with M, N, K for debugging
-    // auto debug_tensor = torch::tensor({M, N, K}, torch::dtype(torch::kInt32));
-    // Copy to GPU result tensor
-    // result.copy_(debug_tensor.to(torch::kCUDA));
-
-    int max_grid_needed = 1 + ((M * N - 1) / MAX_BLOCK_SIZE);
+    int max_grid_needed = (M * N + MAX_BLOCK_SIZE - 1) / MAX_BLOCK_SIZE;
 
     dim3 blockSize(MAX_BLOCK_SIZE);
     dim3 gridSize(max_grid_needed);
@@ -48,7 +45,7 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
         result.contiguous().data_ptr<float>(),
         M, N, K
     );
-    cudaDeviceSynchronize();  // ensure completion
+    cudaDeviceSynchronize();  // Ensure kernel completes
     
     return result;
 }
