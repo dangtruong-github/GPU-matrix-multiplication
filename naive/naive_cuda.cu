@@ -36,7 +36,7 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
     dim3 blockSize(BLOCK_DIM, BLOCK_DIM);
     dim3 gridSize(
         (N + BLOCK_DIM - 1) / BLOCK_DIM,
-        (M + BLOCK_DIM - 1) / BLOCK_DIM,
+        (M + BLOCK_DIM - 1) / BLOCK_DIM
     );
 
     matmul_kernel<<<gridSize, blockSize>>>(
