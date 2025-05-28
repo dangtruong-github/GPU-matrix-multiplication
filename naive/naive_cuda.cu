@@ -2,26 +2,25 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-#define MAX_BLOCK_SIZE 512
+#define BLOCK_DIM 16
 
 __global__ void matmul_kernel(
     float* in1, float* in2, float* out,
     const int M, const int N, const int K
 ) {
-    const int pos = blockIdx.x * blockDim.x + threadIdx.x;
-    const int idxA = pos / N;  // Row index in output (0..M-1)
-    const int idxB = pos % N;  // Column index in output (0..N-1)
+    const int col = blockIdx.x * blockDim.x + threadIdx.x;
+    const int row = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (pos >= M * N) return;
+    if (row >= M || col >= N) return;
 
     float result = 0.0f;
     for (int i = 0; i < K; i++) {
         // Correct indices: in1 is MxK (row idxA, column i) => idxA*K + i
         //                  in2 is KxN (row i, column idxB) => i*N + idxB
-        result += in1[idxA * K + i] * in2[i * N + idxB];
+        result += in1[row * K + i] * in2[i * N + col];
     }
 
-    out[pos] = result;
+    out[row * N + col] = result;
 }
 
 torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
@@ -33,11 +32,12 @@ torch::Tensor matmul(torch::Tensor in1, torch::Tensor in2) {
     const int N = in2.size(1);
 
     auto result = torch::zeros({M, N}, torch::device(torch::kCUDA).dtype(torch::kFloat32));
-    
-    int max_grid_needed = (M * N + MAX_BLOCK_SIZE - 1) / MAX_BLOCK_SIZE;
 
-    dim3 blockSize(MAX_BLOCK_SIZE);
-    dim3 gridSize(max_grid_needed);
+    dim3 blockSize(BLOCK_DIM, BLOCK_DIM);
+    dim3 gridSize(
+        (N + BLOCK_DIM - 1) / BLOCK_DIM,
+        (M + BLOCK_DIM - 1) / BLOCK_DIM,
+    );
 
     matmul_kernel<<<gridSize, blockSize>>>(
         in1.data_ptr<float>(),
